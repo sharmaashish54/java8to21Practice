@@ -1,10 +1,14 @@
 package com.test.java.streams.assignment;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -208,8 +212,73 @@ v. Notes:
 			System.out.println(x.intValue());
 			
 			Optional<Double> price3 = Optional.ofNullable(null);
-			Double z = price3.orElseThrow(()->new RuntimeException("Bad Code"));
-			System.out.println("z "+z);
+			//Double z = price3.orElseThrow(()->new RuntimeException("Bad Code"));
+			//System.out.println("z "+z);
+			
+			
+			
+			/*. Given the AnotherBook class (in the zip file), declare a List typed for AnotherBook namely ‘books’
+			with the following AnotherBook’s:
+				a. title=”Gone with the wind”, genre=”Fiction” (QID 2.1858)
+				b. title=”Bourne Ultimatum”, genre=”Thriller”
+				c. title=”The Client”, genre=”Thriller”
+				Declare the following: List<String> genreList = new ArrayList<>(); 
+				Stream books so that genreList refers to a List containing the genres of the books in the books List.*/
+			List<AnotherBook> anotherBookList = Arrays.asList(new AnotherBook("Gone with the wind","Fiction"),
+					new AnotherBook("Bourne Ultimatum","hriller"),
+					new AnotherBook("The Client","Thriller"));
+			
+
+			List<String> genreList = new ArrayList<>();
+			
+			genreList = anotherBookList.stream().map(s->s.getGenre()).collect(Collectors.toList());
+			genreList.stream().forEach(System.out::println);
+			
+			
+			/*There are two parts:
+a. Generate a DoubleStream using the of() method consisting of the numbers 0, 2 and 4. Note 
+that this stream is a stream of primitives and not a stream of types. Filter in odd numbers only 
+and sum the remaining stream. You should get 0. (QID 2.2024)
+b. Using 1.0 and 3.0, generate a stream of Double’s. Map them to primitive double’s. Filter in 
+even numbers only and calculate the average. Output the result without running the risk of 
+generating an exception.*/
+			DoubleStream dbs = DoubleStream.of(0,2,4);
+			System.out.println(dbs.filter(s->s%2!=0).sum());
+			
+			OptionalDouble odb= Stream.of(1.0,3.0).mapToDouble(s->s.doubleValue()).filter(s->s%2==0).average();
+			if(odb.isPresent())System.out.println(odb.getAsDouble());
+			
+			
+			/*This question demonstrates lazy evaluation. Declare the following List<Integer> ls = 
+Arrays.asList(11, 11, 22, 33, 33, 55, 66);
+a. stream the List (note that this is possible because List is a Collection and Collection defines a 
+stream() method); ensure only distinct (unique) numbers are streamed; check if “any match”
+11. You should get true for this.
+b. stream the List again (this is necessary because once a stream is closed by a previous terminal 
+operation, you must re-create the stream); check to see if “none match” the expression 
+x%11>0. Note that the terminal operation noneMatch(Predicate) needs to return false for 
+every element in the stream for noneMatch() to return true. In other words, “none of them 
+match this….that’s correct, none of them do; return true”. You should get true here as well.*/
+			
+			List<Integer> list = Arrays.asList(11, 11, 22, 33, 33, 55, 66);
+			System.out.println(list.stream().distinct().anyMatch(s->s==11));
+			
+			System.out.println(list.stream().noneMatch(s->s%11>0));
+			
+			
+			/*. Examine the following code. Note that an AtomicInteger is a version of Integer that is safe to use in 
+concurrent (multi-threaded) environments. The method incrementAndGet() is similar to ++ai 
+The following code generates an IllegalStateException. Fix the code*/
+			
+			AtomicInteger ai = new AtomicInteger(); // initial value of 0
+	        Stream<Integer> stream = Stream.of(11, 11, 22, 33, 34).parallel();
+	        Stream<Integer> stream2 = stream.filter( e->{     
+	            ai.incrementAndGet();     
+	            return e%2==0; }); 
+	        stream2.forEach(System.out::println);// 22,34
+	        System.out.println(ai);
+			
+			
 			
 		}
 	
